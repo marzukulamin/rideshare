@@ -1,0 +1,13 @@
+{
+  "name": "RideShare Bangladesh",
+  "short_name": "RideShare",
+  "description": "A thoughtful way to get around Bangladesh.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0b0e0d",
+  "theme_color": "#0b0e0d",
+  "orientation": "portrait-primary",
+  "icons": [
+    {"src":"/assets/mark.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}
+  ]
+}

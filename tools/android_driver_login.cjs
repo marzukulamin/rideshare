@@ -1,0 +1,2 @@
+const ui=require('./android_ui.cjs'),fs=require('fs');
+(async()=>{const a=JSON.parse(fs.readFileSync(ui.root+'/.local/backend/test-accounts.json','utf8')).driver;await ui.type('Phone number',a.phone);await ui.type('Password',a.password);ui.command('shell','input','keyevent','4');await ui.click('Sign in',{scroll:false});await ui.wait(1800);console.log(JSON.stringify(ui.summary()));ui.screenshot('emulator-driver-home');})().catch(e=>{console.error(e.message);process.exit(1)});

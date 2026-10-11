@@ -1,0 +1,4 @@
+<?php
+declare(strict_types=1);require __DIR__.'/../src/platform/core.php';require __DIR__.'/../src/platform/uploads.php';
+if(PHP_SAPI!=='cli')exit(1);
+$checked=0;foreach(['rs_documents','rs_attachments'] as $table)foreach(rows('SELECT id,storage_key FROM '.$table.' WHERE scan_status="pending" LIMIT 100') as $file){if(!preg_match('/^[a-f0-9]{32}$/',$file['storage_key']))continue;$path=private_storage().'/documents/'.$file['storage_key'];if(!is_file($path))continue;try{$scan=scan_bytes(decrypt_value(file_get_contents($path)));}catch(HttpFailure $e){if($e->status!==422)throw $e;$scan='rejected';}sql('UPDATE '.$table.' SET scan_status=? WHERE id=? AND scan_status="pending"',[$scan,$file['id']]);audit(null,'maintenance.file.scan',(string)$file['id'],'Local scanner result '.$scan);$checked++;}echo 'Processed '.$checked.' quarantined private files.'.PHP_EOL;

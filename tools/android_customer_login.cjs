@@ -1,0 +1,2 @@
+const fs=require('fs'),ui=require('./android_ui.cjs');
+(async()=>{const a=JSON.parse(fs.readFileSync(ui.root+'/.local/backend/test-accounts.json','utf8')).customer;await ui.type('Phone number',a.phone);await ui.type('Password',a.password);ui.command('shell','input','keyevent','4');await ui.click('Sign in',{scroll:false});await ui.wait(2500);console.log(JSON.stringify(ui.summary()));console.log(ui.screenshot('phone-customer-home'));})().catch(e=>{console.error(e.message);process.exit(1)});

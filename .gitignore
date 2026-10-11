@@ -1,0 +1,17 @@
+.tools/
+.local/
+.env
+docs/reference/frames/
+docs/reference/contact-sheet.jpg
+mobile/.dart_tool/
+mobile/build/
+mobile/.flutter-plugins-dependencies
+mobile/android/local.properties
+mobile/android/key.properties
+*.jks
+*.keystore
+release/
+**/__pycache__/
+*.py[cod]
+**/.gradle/
+**/.kotlin/

@@ -1,0 +1,14 @@
+<?php
+declare(strict_types=1);
+putenv('APP_ENV=local');require __DIR__.'/../src/platform/core.php';
+$accounts=decode(file_get_contents(__DIR__.'/../.local/backend/test-accounts.json'));
+$checks=0;$tokens=[];
+function check(bool $ok,string $label):void{global $checks;if(!$ok)throw new RuntimeException('FAILED: '.$label);$checks++;echo 'PASS '.$label."\n";}
+function call_api(string $action,?array $body=null,?string $token=null,array $query=[],?string $key=null,array $extra=[]):array{
+ $c=curl_init('http://127.0.0.1:8098/api.php?'.http_build_query(['action'=>$action]+$query));$headers=array_merge(['Accept: application/json'],$extra);if($token)$headers[]='Authorization: Bearer '.$token;
+ if($body!==null){$headers[]='Content-Type: application/json';$headers[]='Idempotency-Key: '.($key??identifier());curl_setopt($c,CURLOPT_POST,true);curl_setopt($c,CURLOPT_POSTFIELDS,j($body));}
+ curl_setopt_array($c,[CURLOPT_HTTPHEADER=>$headers,CURLOPT_RETURNTRANSFER=>true,CURLOPT_TIMEOUT=>15]);$raw=curl_exec($c);$status=curl_getinfo($c,CURLINFO_RESPONSE_CODE);curl_close($c);$result=decode($raw);if(!is_array($result))throw new RuntimeException('Non-JSON response to '.$action);return [$status,$result];
+}
+function ok_api(string $a,?array $b=null,?string $t=null,array $q=[],?string $key=null):array{[$status,$r]=call_api($a,$b,$t,$q,$key);if($status!==200)throw new RuntimeException($a.' returned '.$status.': '.($r['error']??'unknown'));return $r;}
+function login_fixture(string $role):string{global $accounts;$file=__DIR__.'/../.local/backend/test-tokens.json';$cache=is_file($file)?decode(file_get_contents($file)):[];if(isset($cache[$role])){[$status]=call_api('bootstrap',null,$cache[$role]);if($status===200)return $cache[$role];}$a=$accounts[$role];$code=$a['totpSecret']?totp_code($a['totpSecret'],(int)floor(time()/30)):'';$token=ok_api('login',['phone'=>$a['phone'],'password'=>$a['password'],'code'=>$code,'client'=>'android','device'=>'Integration verification'])['token'];$cache[$role]=$token;file_put_contents($file,j($cache));return $token;}
+function race_offers(array $jobs):array{$base=__DIR__.'/../.local/backend/race-'.identifier();$barrier=$base.'-go';$processes=[];foreach($jobs as $i=>$job){$input=$base.'-'.$i.'.json';$output=$base.'-'.$i.'-result.json';file_put_contents($input,j($job));$pipes=[];$processes[]=[$input,$output,proc_open([PHP_BINARY,__DIR__.'/accept_offer_worker.php',$input,$output,$barrier],[0=>['pipe','r'],1=>['pipe','w'],2=>['pipe','w']],$pipes),$pipes];}file_put_contents($barrier,'go');$results=[];foreach($processes as [$input,$output,$process,$pipes]){fclose($pipes[0]);stream_get_contents($pipes[1]);stream_get_contents($pipes[2]);fclose($pipes[1]);fclose($pipes[2]);proc_close($process);$results[]=decode(file_get_contents($output));unlink($input);unlink($output);}unlink($barrier);return $results;}

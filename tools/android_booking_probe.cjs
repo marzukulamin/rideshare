@@ -1,0 +1,2 @@
+const ui=require('./android_ui.cjs'),fs=require('fs');
+(async()=>{await ui.click('Where to?');await ui.click(/^Choose pickup/);await ui.click(/^Farmgate/);await ui.click('Choose destination');await ui.click(/^Dhanmondi Lake/);await ui.click(/^Car ·/);await ui.click('Review price');console.log(JSON.stringify(ui.summary()));console.log(ui.screenshot('phone-quote'));})().catch(e=>{console.error(e.message);process.exit(1)});

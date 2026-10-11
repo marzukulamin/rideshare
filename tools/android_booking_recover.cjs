@@ -1,0 +1,2 @@
+const ui=require('./android_ui.cjs');
+(async()=>{ui.command('shell','input','keyevent','123');ui.command('shell','input','keyevent',...Array(40).fill('67'));ui.command('shell','input','keyevent','4');await ui.wait(1000);console.log(JSON.stringify(ui.summary()));await ui.click(/^Dhanmondi Lake/,{scroll:false});console.log(JSON.stringify(ui.summary()));ui.screenshot('phone-booking');})().catch(e=>{console.error(e.message);process.exit(1)});

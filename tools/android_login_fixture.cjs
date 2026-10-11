@@ -1,0 +1,2 @@
+const fs=require('fs'),ui=require('./android_ui.cjs');
+(async()=>{const role=process.env.RIDESHARE_ACCOUNT||'customer_walkthrough';const a=JSON.parse(fs.readFileSync(ui.root+'/.local/backend/test-accounts.json','utf8'))[role];if(!a)throw Error('Unknown fixture');await ui.type('Phone number',a.phone);await ui.type('Password',a.password);ui.command('shell','input','keyevent','4');await ui.click('Sign in',{scroll:false});await ui.wait(1800);console.log(JSON.stringify(ui.summary()));})().catch(e=>{console.error(e.message);process.exit(1)});

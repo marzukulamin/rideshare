@@ -1,0 +1,2 @@
+<?php
+require __DIR__.'/test_client.php';$role=$argv[1]??'driver';if(!in_array($role,['driver','driver_secondary']))throw new RuntimeException('Use an isolated driver fixture');$driver=login_fixture($role);$d=ok_api('driver-overview',null,$driver);echo j(['ready'=>$d['ready'],'receiving_offers'=>$d['receiving_offers'],'location_fresh'=>$d['location_fresh']??null,'heartbeat_at'=>$d['profile']['heartbeat_at'],'reasons'=>$d['reasons']]);
