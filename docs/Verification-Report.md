@@ -1,5 +1,19 @@
 # RideShare verification and local handoff
 
+## Startup recovery update — 1.2.1+4
+
+11 October 2026, Asia/Dhaka. The new signed Android APK and browser build passed Flutter analysis and all 12 tests. Android 16 emulator installation retained application data. The native recovery test removed the USB backend tunnel, observed the startup error and Retry connection, restored the tunnel, and verified return to the existing Driver account. Evidence is private under `.local/verification/startup-recovery.json`, `startup-offline.png` and `startup-recovered.png`.
+
+The rebuilt browser client passed separate Customer, Driver and Support login and Customer booking-screen smoke checks, with no observed browser runtime errors or external runtime requests. The smoke script now supports Bengali labels and explicitly opens Home instead of assuming the account's saved tab.
+
+Current APK: `release/site/downloads/rideshare-1.2.1.apk`, SHA-256 `66442776c3bb588930407587485c96c8f07b31f067d5d42fc09c9d32b80947ac`. It was installed on the emulator and subsequently the connected Samsung SM-S938B running Android 16, using an update install that preserved the existing customer session. Samsung offline startup and retry after restoring the USB tunnel passed. Pickup/destination selection and a server Car fare quote passed; no ride was requested and the phone was returned to Customer Home. No Flutter exception, fatal exception or out-of-memory error appeared in the recent logs inspected during these checks. This does not establish every possible device journey or background-service scenario.
+
+Physical evidence: `.local/verification/startup-recovery-R5CY23MS2SP.json`, `booking-smoke-R5CY23MS2SP.json` and corresponding device-specific screenshots. The test helper now scrolls within visible scrollable app bounds to avoid swiping on the keyboard. Earlier booking script attempts failed due to verification assumptions; the final corrected check passed. The earlier Samsung journey/tracking and walkthrough results below apply to 1.2.0+3. At the user's request, the existing walkthrough is now included in `media/` and the GitHub release with its original version and APK hash explicitly preserved; it is not presented as footage of the new recovery fixes.
+
+This APK still uses the computer's backend at `http://127.0.0.1:8098/` through USB forwarding. Independent remote client testing requires hosting the backend and rebuilding with its HTTPS URL. No hosting address or access is available yet, so remote deployment is incomplete. The database was not migrated or reset.
+
+## Previous release evidence — 1.2.0+3
+
 11 October 2026 · Asia/Dhaka. Version **1.2.0+3**. Results describe the recorded scenarios, not full acceptance of all 172 stories. Remaining clauses are recorded individually in [the implementation plan](RideShare-User-Stories-and-Implementation-Plan.md).
 
 | Verification | Result | Scope |

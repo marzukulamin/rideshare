@@ -4,6 +4,16 @@
 
 ## Start and verify
 
+### Repeated startup and phone connection failures
+
+Use `tools/connect_android.ps1` to verify/start the local services and restore the USB backend tunnel for one authorized Android device. With multiple devices, supply `-Serial`. A disconnect or device restart can remove the tunnel; rerun the command. The script does not move or reset the database.
+
+The 1.2.1+4 client shows startup connection errors on the login screen, provides Retry connection, finishes the loading state even when startup fails, and ignores notifications from requests finishing after disposal. Failed connections preserve the last confirmed trip state and pending operation keys. Driver tracking interruptions remain visible after refresh.
+
+The Windows Dart error at `_Platform.resolvedExecutable` was reproduced inside the restricted process environment. The same SDK starts in approved execution outside that restriction. Builds now check Dart startup before invoking Flutter so the failure does not cause ten repeated bootstrap attempts. Run the build from a normal PowerShell session or approved execution outside the restriction. Computer free memory was also low during diagnosis; this observation alone does not establish an Android low-memory crash.
+
+The local APK cannot serve a distant phone independently. Remote access needs an owned HTTPS PHP backend with the database on that server, and a rebuilt APK with its `BACKEND_URL`. No Google Play publishing is needed for direct APK distribution. A hosting URL and access are still required before remote deployment can be completed.
+
 Run `tools/start_local.ps1` from PowerShell. It starts or verifies only the own loopback services: MariaDB 3317, PHP 8098, GraphHopper 8989/admin 8990, ClamAV 3320, and the thirty-second operations worker. It rejects an unrecognized owner on a required port. Leave the unrelated database on 3307 alone. Logs and process records remain under `.local/backend`; do not publish that directory.
 
 Open `http://127.0.0.1:8098/demo/`. For an authorized USB Android device, run `.tools/android-sdk/platform-tools/adb.exe -s DEVICE_SERIAL reverse tcp:8098 tcp:8098` and install the matching signed release APK. The APK uses loopback for this test phase; it needs the USB tunnel. This is not yet the URL for remote clients. The user's HTTPS hosting address is pending, by choice.

@@ -1,0 +1,18 @@
+RideShare — actual Android walkthrough
+45 seconds; silent with on-screen descriptions.
+Local development fixtures, no real money.
+
+00–09s · Customer · Samsung Android
+Book in a few taps. Choose your pickup and destination. Database-backed places and a bundled map.
+
+09–18s · Customer · Samsung Android
+Review your fare. See the road fare before requesting. Cash, service terms and your chosen vehicle.
+
+18–27s · Driver · Android emulator
+Your driver handles pickup. The assigned driver confirms arrival. Separate accounts. Assigned-driver controls.
+
+27–36s · Driver · Android emulator
+PIN checked. Ride started. The driver validates the customer’s PIN. Customer screens never expose a Start ride button.
+
+36–45s · Customer · Samsung Android
+Cash confirmed. Receipt saved. Your cash confirmation is recorded. The completed trip remains in your history.

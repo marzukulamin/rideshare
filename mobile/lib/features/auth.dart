@@ -49,6 +49,22 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
                   ),
                   const UiText('Your city. Your next ride.'),
+                  if (widget.store.error != null) ...[
+                    const SizedBox(height: 16),
+                    Text(
+                      widget.store.error!,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
+                    ),
+                    TextButton.icon(
+                      onPressed: widget.store.loading
+                          ? null
+                          : widget.store.initialize,
+                      icon: const Icon(Icons.refresh),
+                      label: const Text('Retry connection'),
+                    ),
+                  ],
                   const SizedBox(height: 32),
                   TextFormField(
                     controller: phone,

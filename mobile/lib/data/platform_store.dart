@@ -35,6 +35,7 @@ class PlatformStore extends ChangeNotifier {
   Record data = {};
   Record emergency = {};
   bool loading = true, busy = false;
+  bool _disposed = false;
   DateTime? refreshedAt;
   final Map<String, String> pendingOperations = {};
   StreamSubscription<Position>? locationStream;
@@ -189,7 +190,9 @@ class PlatformStore extends ChangeNotifier {
       }
     } catch (_) {
       throw ApiFailure(
-        'Connection interrupted. Refresh to check whether your action was saved before retrying.',
+        !kIsWeb && (base.host == '127.0.0.1' || base.host == 'localhost')
+            ? 'Cannot reach the local test server. Keep this phone connected to the computer by USB and restore its connection. Remote use requires a hosted server. Check whether your action was saved before retrying.'
+            : 'Connection interrupted. Refresh to check whether your action was saved before retrying.',
         0,
       );
     }
@@ -217,10 +220,13 @@ class PlatformStore extends ChangeNotifier {
   }
 
   Future<void> initialize() async {
-    emergency = record(
-      jsonDecode(await rootBundle.loadString('assets/emergency.json')),
-    );
+    loading = true;
+    error = null;
+    notifyListeners();
     try {
+      emergency = record(
+        jsonDecode(await rootBundle.loadString('assets/emergency.json')),
+      );
       if (!kIsWeb) token = await storage.read(key: 'rideshare_session');
       final saved = await storage.read(key: 'rideshare_operations');
       if (saved != null) {
@@ -233,13 +239,15 @@ class PlatformStore extends ChangeNotifier {
       } else {
         error = '$e';
       }
+    } finally {
+      loading = false;
+      notifyListeners();
     }
-    loading = false;
-    notifyListeners();
   }
 
   Future<void> refresh() async {
     data = await api('bootstrap');
+    error = null;
     if (!kIsWeb && (can('driver') || can('active_driver'))) {
       try {
         final running = await const MethodChannel('rideshare/driver_transport')
@@ -251,7 +259,6 @@ class PlatformStore extends ChangeNotifier {
 
     csrf = user['csrf'];
     refreshedAt = DateTime.now();
-    error = null;
     notifyListeners();
   }
 
@@ -327,7 +334,13 @@ class PlatformStore extends ChangeNotifier {
   }
 
   @override
+  void notifyListeners() {
+    if (!_disposed) super.notifyListeners();
+  }
+
+  @override
   void dispose() {
+    _disposed = true;
     locationStream?.cancel();
     client.close();
     super.dispose();

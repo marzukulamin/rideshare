@@ -40,5 +40,16 @@ if capturemeta.exists():
    if not (capture/filename).exists():raise SystemExit('Matching walkthrough requires video, captions and transcript.')
    shutil.copy2(capture/filename,media/filename)
   record.update(video='/media/rideshare-walkthrough.mp4',captions='/media/rideshare-walkthrough.vtt',transcript='/media/walkthrough-transcript.txt',videoSha256=captured['videoSha256'],captureLabel=captured['label'])
+# An explicitly published earlier walkthrough may accompany a newer app,
+# with its original version/hash retained rather than claimed as current evidence.
+published=root/'media';publishedmeta=published/'walkthrough.json'
+if 'video' not in record and publishedmeta.is_file():
+ captured=json.loads(publishedmeta.read_text(encoding='utf-8'))
+ if not captured.get('recordedVersion') or not captured.get('apkSha256'):raise SystemExit('Published walkthrough requires its original version and APK hash.')
+ for filename,key in [('rideshare-walkthrough.mp4','videoSha256'),('rideshare-walkthrough.vtt','captionsSha256'),('walkthrough-transcript.txt','transcriptSha256')]:
+  if not (published/filename).is_file() or digest(published/filename)!=captured.get(key):raise SystemExit('Published walkthrough bytes do not match verified metadata.')
+  shutil.copy2(published/filename,media/filename)
+ shutil.copy2(publishedmeta,media/'walkthrough.json')
+ record.update(video='/media/rideshare-walkthrough.mp4',captions='/media/rideshare-walkthrough.vtt',transcript='/media/walkthrough-transcript.txt',videoSha256=captured['videoSha256'],captureLabel=captured['label'],walkthroughRecordedVersion=captured['recordedVersion'],walkthroughApkSha256=captured['apkSha256'],walkthroughMatchesCurrentApk=captured['apkSha256']==record.get('sha256'))
 (target/'release.json').write_text(json.dumps(record,indent=2)+'\n',encoding='utf-8')
 print('Staged RideShare',version,'app artifacts. No portfolio page included.')

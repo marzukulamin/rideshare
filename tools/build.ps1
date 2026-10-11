@@ -16,6 +16,8 @@ if(!(Test-Path -LiteralPath ($aliasRoot+'.tools\flutter\bin\flutter.bat'))){thro
 $flutterTool=$aliasRoot+'.tools\flutter\bin\flutter.bat'
 $env:PUB_CACHE=$aliasRoot+'.tools\pub-cache';$env:GRADLE_USER_HOME=$aliasRoot+'.tools\gradle'
 $env:ANDROID_HOME=$aliasRoot+'.tools\android-sdk';$env:ANDROID_SDK_ROOT=$env:ANDROID_HOME;$env:JAVA_HOME=$JavaHome
+& ($aliasRoot+'.tools\flutter\bin\cache\dart-sdk\bin\dart.exe') --disable-dart-dev (Join-Path $PSScriptRoot 'check_dart_runtime.dart')
+if($LASTEXITCODE){throw 'Dart runtime startup failed. Resolve the execution environment before building; Flutter retries will not fix it.'}
 $sourceBefore=(& C:\Python313\python.exe (Join-Path $PSScriptRoot 'build_sources.py') | ConvertFrom-Json).sourceSha256
 if(!$sourceBefore -or $LASTEXITCODE){throw 'Cannot fingerprint active build sources.'}
 Push-Location ($aliasRoot+'mobile')

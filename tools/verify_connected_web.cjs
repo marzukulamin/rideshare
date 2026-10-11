@@ -16,8 +16,9 @@ function totp(secret){let bits='';for(const c of secret)bits+='ABCDEFGHIJKLMNOPQ
   await page.getByRole('button',{name:'Sign in',exact:true}).click();try{await page.getByRole('button',{name:/Inbox/}).first().waitFor({timeout:10000});}catch(e){await page.screenshot({path:path.join(evidence,role+'-login-result.png')});console.log('Login result button labels: '+JSON.stringify(await page.getByRole('button').allTextContents()));console.log('Visible errors: '+JSON.stringify(await page.locator('flt-semantics').filter({hasText:/incorrect|expired|failed|attempts|security token|unavailable/}).allTextContents()));throw e;}console.log('Authenticated '+role+' browser context');return page;
  }
  const customer=await pageFor('customer'),driver=await pageFor('driver'),staff=await pageFor('support',{width:1280,height:900});
+ await customer.getByRole('button',{name:/^(Home|হোম)/}).or(customer.getByRole('tab',{name:/^(Home|হোম)/})).first().click();
  await customer.screenshot({path:path.join(evidence,'customer-home.png')});await driver.screenshot({path:path.join(evidence,'driver-home.png')});await staff.screenshot({path:path.join(evidence,'staff-home.png')});
- await customer.getByRole('button',{name:'Where to?',exact:true}).click();
+ await customer.getByRole('button',{name:/^(Where to\?|কোথায় যাবেন\?)$/}).click();
  fs.writeFileSync(path.join(evidence,'browser-probe.json'),JSON.stringify({customer:await customer.locator('body').ariaSnapshot(),driver:await driver.locator('body').ariaSnapshot(),staff:await staff.locator('body').ariaSnapshot(),external,errors},null,2));
  console.log('Connected customer, driver and staff sessions opened in separate browser contexts. Probe saved.');
  if(external.length||errors.length)throw Error('Unexpected runtime request or browser error');

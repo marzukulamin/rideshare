@@ -5,7 +5,22 @@ function command(...args){try{return cp.execFileSync(adb,['-s',serial,...args],{
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 function nodes(){const current=command('shell','dumpsys','activity','activities');if(!current.split('\n').some(l=>/mResumedActivity|topResumedActivity/.test(l)&&l.includes(pkg)))throw Error('RideShare is not the foreground app; no unrelated screen was inspected.');command('shell','uiautomator','dump','/sdcard/rideshare-ui.xml');const xml=command('shell','cat','/sdcard/rideshare-ui.xml');return [...xml.matchAll(/<node\s+([^>]+)>/g)].map(m=>Object.fromEntries([...m[1].matchAll(/([\w-]+)="([^"]*)"/g)].map(a=>[a[1],a[2].replace(/&amp;/g,'&').replace(/&quot;/g,'"').replace(/&#10;/g,'\n').replace(/&apos;/g,"'")]))).filter(n=>n.package===pkg);}
 function tapNode(n){const v=(n.bounds||'').match(/\d+/g)?.map(Number);if(!v||v[0]===v[2]||v[1]===v[3])throw Error('Control has no visible bounds');command('shell','input','tap',String(Math.round((v[0]+v[2])/2)),String(Math.round((v[1]+v[3])/2)));}
-async function click(label,{scroll=true}={}){for(let i=0;i<(scroll?14:3);i++){const list=nodes();const n=list.find(n=>n.enabled==='true'&&n.clickable==='true'&&(typeof label==='string'?[n.text,n['content-desc'],n.hint].includes(label):[n.text,n['content-desc'],n.hint].some(v=>label.test(v||''))));if(n){tapNode(n);await wait(450);return;}if(scroll){const bounds=list.map(n=>(n.bounds||'').match(/\d+/g)?.map(Number)).filter(v=>v?.length===4);const w=Math.max(...bounds.map(v=>v[2])),h=Math.max(...bounds.map(v=>v[3]));if(!w||!h)throw Error('Own app viewport unavailable');command('shell','input','swipe',String(w*.5),String(h*.72),String(w*.5),String(h*.27),'250');await wait(300);}}throw Error('RideShare control unavailable: '+String(label));}
+async function click(label,{scroll=true}={}){
+ for(let i=0;i<(scroll?14:3);i++){
+  const list=nodes();
+  const n=list.find(n=>n.enabled==='true'&&n.clickable==='true'&&(typeof label==='string'?[n.text,n['content-desc'],n.hint].includes(label):[n.text,n['content-desc'],n.hint].some(v=>label.test(v||''))));
+  if(n){tapNode(n);await wait(450);return;}
+  if(scroll){
+   const areas=list.filter(n=>n.scrollable==='true').map(n=>(n.bounds||'').match(/\d+/g)?.map(Number)).filter(v=>v?.length===4&&v[2]>v[0]&&v[3]-v[1]>80).sort((a,b)=>(b[2]-b[0])*(b[3]-b[1])-(a[2]-a[0])*(a[3]-a[1]));
+   const area=areas[0];
+   if(!area)throw Error('No visible RideShare scroll area for '+String(label));
+   const x=Math.round((area[0]+area[2])/2),height=area[3]-area[1];
+   command('shell','input','swipe',String(x),String(Math.round(area[1]+height*.8)),String(x),String(Math.round(area[1]+height*.2)),'250');
+   await wait(300);
+  }
+ }
+ throw Error('RideShare control unavailable: '+String(label));
+}
 async function type(label,value){const n=nodes().find(n=>[n.text,n['content-desc'],n.hint].some(v=>(v||'').includes(label)));if(!n)throw Error('Field unavailable: '+label);tapNode(n);command('shell','input','text',"'"+value.replace(/'/g,"'\\''")+"'");await wait(150);}
 function screenshot(name){const out=path.join(root,'.local/verification');fs.mkdirSync(out,{recursive:true});const buf=cp.execFileSync(adb,['-s',serial,'exec-out','screencap','-p'],{timeout:20000,maxBuffer:16*1024*1024});fs.writeFileSync(path.join(out,name+'.png'),buf);return path.join(out,name+'.png');}
 function summary(){return nodes().filter(n=>n.password!=='true'&&n.class!=='android.widget.EditText').map(n=>n.text||n['content-desc']).filter(Boolean);}

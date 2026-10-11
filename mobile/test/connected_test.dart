@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
@@ -11,6 +12,56 @@ import 'package:rideshare_showcase/main.dart';
 import 'package:rideshare_showcase/features/booking.dart';
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+  test(
+    'offline startup finishes and reconnects without losing its session',
+    () async {
+      FlutterSecureStorage.setMockInitialValues({
+        'rideshare_session': 'saved-session',
+      });
+      var offline = true;
+      final s = PlatformStore(
+        client: MockClient((request) async {
+          expect(request.headers['Authorization'], 'Bearer saved-session');
+          if (offline) throw Exception('offline');
+          return http.Response(
+            '{"user":{"id":1,"permissions":["customer"]}}',
+            200,
+          );
+        }),
+      );
+      await s.initialize();
+      expect(s.loading, isFalse);
+      expect(s.error, contains('local test server'));
+      expect(s.token, 'saved-session');
+      offline = false;
+      await s.initialize();
+      expect(s.error, isNull);
+      expect(s.signedIn, isTrue);
+      s.dispose();
+    },
+  );
+  testWidgets('startup connection failure is visible and offers retry', (
+    t,
+  ) async {
+    final s = PlatformStore();
+    s.loading = false;
+    s.error = 'Cannot reach the local test server.';
+    await t.pumpWidget(RideShareApp(store: s));
+    await t.pumpAndSettle();
+    expect(find.text('Cannot reach the local test server.'), findsOneWidget);
+    expect(find.text('Retry connection'), findsOneWidget);
+    await t.pumpWidget(const SizedBox());
+    s.dispose();
+  });
+  test('an in-flight refresh can finish after the store is disposed', () async {
+    final s = PlatformStore(
+      client: MockClient((_) async => http.Response('{"user":{}}', 200)),
+    );
+    final refresh = s.refresh();
+    s.dispose();
+    await expectLater(refresh, completes);
+  });
   test('money input rejects malformed, non-finite and negative amounts', () {
     expect(bdtMinor('7.50'), 750);
     expect(bdtMinor('0'), 0);
