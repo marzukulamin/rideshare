@@ -25,7 +25,7 @@ with zipfile.ZipFile(archive, 'w', zipfile.ZIP_DEFLATED) as bundle:
 artifacts = [archive, site / 'downloads' / f'rideshare-{version}.apk',
              site / 'media/rideshare-walkthrough.mp4',
              site / 'media/rideshare-walkthrough.vtt',
-             site / 'media/walkthrough-transcript.txt', site / 'release.json']
+             site / 'media/walkthrough-transcript.txt', site / 'media/walkthrough.json', site / 'release.json']
 lines = []
 for file in artifacts:
     with file.open('rb') as stream:

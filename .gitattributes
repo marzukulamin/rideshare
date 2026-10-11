@@ -1,4 +1,4 @@
 # Preserve published media bytes so checksums survive Windows/Linux checkouts.
 media/rideshare-walkthrough.mp4 binary
-media/rideshare-walkthrough.vtt -text
-media/walkthrough-transcript.txt -text
+media/rideshare-walkthrough.vtt -text whitespace=cr-at-eol
+media/walkthrough-transcript.txt -text whitespace=cr-at-eol
