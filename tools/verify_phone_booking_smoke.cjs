@@ -5,6 +5,8 @@ const path = require('path');
   u.command('shell', 'am', 'force-stop', u.pkg);
   u.command('shell', 'am', 'start', '-W', '-n', u.pkg + '/.MainActivity');
   await u.wait(2000);
+  await u.click('Sign in with an account', {scroll: false});
+  await u.wait(2000);
   await u.click('Where to?');
   await u.click(/^Choose pickup/);
   await u.click(/^Farmgate/);

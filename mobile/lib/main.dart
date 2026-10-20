@@ -4,24 +4,29 @@ import 'package:flutter/material.dart';
 import 'data/platform_store.dart';
 import 'features/auth.dart';
 import 'features/shell.dart';
+import 'features/offline_demo.dart';
 import 'ui/theme.dart';
 
 void main() => runApp(RideShareApp());
 
 class RideShareApp extends StatefulWidget {
   final PlatformStore? store;
-  const RideShareApp({super.key, this.store});
+  final bool? startAtWelcome;
+  const RideShareApp({super.key, this.store, this.startAtWelcome});
   @override
   State<RideShareApp> createState() => _RideShareAppState();
 }
 
 class _RideShareAppState extends State<RideShareApp> {
   late final PlatformStore store;
+  late String mode;
   @override
   void initState() {
     super.initState();
     store = widget.store ?? PlatformStore();
-    if (widget.store == null) store.initialize();
+    mode = (widget.startAtWelcome ?? widget.store == null)
+        ? 'welcome'
+        : 'connected';
   }
 
   @override
@@ -35,7 +40,9 @@ class _RideShareAppState extends State<RideShareApp> {
     listenable: store,
     builder: (context, _) => MaterialApp(
       key: ValueKey(
-        '${store.user['id']}:${store.signedIn}:${store.user['roles']}:${store.user['status']}',
+        mode == 'connected'
+            ? '${store.user['id']}:${store.signedIn}:${store.user['roles']}:${store.user['status']}'
+            : mode,
       ),
       locale: '${store.user['locale']}'.startsWith('bn')
           ? const Locale('bn', 'BD')
@@ -66,11 +73,38 @@ class _RideShareAppState extends State<RideShareApp> {
           child: child!,
         );
       },
-      home: store.loading
-          ? const Scaffold(body: Center(child: CircularProgressIndicator()))
+      home: mode == 'welcome'
+          ? DemoWelcomePage(
+              onDemo: () => setState(() => mode = 'demo'),
+              onSignIn: () {
+                setState(() => mode = 'connected');
+                store.initialize();
+              },
+            )
+          : mode == 'demo'
+          ? OfflineDemoPage(onExit: () => setState(() => mode = 'welcome'))
+          : store.loading
+          ? Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    TextButton(
+                      onPressed: () => setState(() => mode = 'demo'),
+                      child: const Text('Try Demo instead'),
+                    ),
+                  ],
+                ),
+              ),
+            )
           : store.signedIn
           ? AppShell(store: store)
-          : LoginPage(store: store),
+          : LoginPage(
+              store: store,
+              onTryDemo: () => setState(() => mode = 'demo'),
+            ),
     ),
   );
 }

@@ -4,6 +4,8 @@
 
 ## Start and verify
 
+As of 1.3.0, the app opens on a welcome screen. **Try Demo** needs none of the services below and never accesses real accounts. Choose **Sign in with an account** to restore a real saved session or connect to the backend. See [Offline portfolio demo](Offline-Portfolio-Demo.md).
+
 ### Repeated startup and phone connection failures
 
 Use `tools/connect_android.ps1` to verify/start the local services and restore the USB backend tunnel for one authorized Android device. With multiple devices, supply `-Serial`. A disconnect or device restart can remove the tunnel; rerun the command. The script does not move or reset the database.

@@ -24,7 +24,7 @@ for relative in ['demo','downloads','media']:
   if not saved.resolve().is_relative_to(root.resolve()):raise SystemExit('Archive destination escapes this workspace.')
   shutil.move(str(previous),str(saved))
 shutil.copytree(web,target/'demo')
-record={'version':version,'minimumAndroid':'7.0','webBuiltAt':webmeta['builtAt'],'backend':androidmeta.get('backend'),'builtAt':androidmeta.get('builtAt'),'localDeviceRequiresAdbReverse':androidmeta.get('backend','').startswith('http://127.0.0.1')}
+record={'version':version,'minimumAndroid':'7.0','webBuiltAt':webmeta['builtAt'],'backend':androidmeta.get('backend'),'builtAt':androidmeta.get('builtAt'),'offlineDemo':True,'demoRequiresBackend':False,'connectedModeRequiresBackend':True,'localDeviceRequiresAdbReverse':False,'connectedModeRequiresAdbReverse':androidmeta.get('backend','').startswith('http://127.0.0.1')}
 if apk.exists():
  downloads=target/'downloads';downloads.mkdir(exist_ok=True);filename=f'rideshare-{name}.apk';shutil.copy2(apk,downloads/filename)
  record.update(apk='/downloads/'+filename,apkSizeMb=round(apk.stat().st_size/1024/1024,1),sha256=hashlib.file_digest(apk.open('rb'),'sha256').hexdigest())

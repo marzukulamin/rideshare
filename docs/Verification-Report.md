@@ -1,5 +1,17 @@
 # RideShare verification and local handoff
 
+## Offline portfolio demo — 1.3.0+5
+
+20 October 2026, Asia/Dhaka. The app now starts on a welcome screen with **Try Demo** and a separate real-account sign-in option. Try Demo does not initialize the backend store, read saved credentials, access GPS or request a real ride. Sample data and demo changes stay in memory. Existing real sessions and operations remain intact.
+
+Flutter analysis is clean and all **15 tests pass**. Coverage includes a full simulated booking through driver match, arrival, pickup, completion, Activity, reset and exit at a 360px viewport, with backend requests blocked and an existing real session preserved. Model checks cover invalid same-place routes, active-booking preservation, cancellation and duplicate-history prevention.
+
+The compiled browser demo passed on a plain static server with no PHP/database backend. Runtime interception blocked backend and external requests; the completed journey made **zero** such requests and produced no browser errors. Evidence is private under `.local/verification/offline-demo-browser.json` and `offline-demo-activity.png`.
+
+Signed release APK: `release/site/downloads/rideshare-1.3.0.apk`, versionName `1.3.0`, versionCode `5`, minimum Android API 24. `apksigner verify` passed. APK SHA-256: `fb57b86950f476df4cf63c0cdbe674ab4f1cd074c48c496cc63f15356211a2ce`. No physical Android device was connected for this update; the earlier Samsung and emulator checks below apply to their named releases. This update was checked through model/widget tests, the compiled browser demo, Android release compilation and signature/manifest verification.
+
+The existing walkthrough remains recorded on 1.2.0+3, accurately labeled in the release metadata. It does not show the new offline mode. The separate portfolio website has not been edited. See [Offline portfolio demo](Offline-Portfolio-Demo.md) for visitor instructions and [portfolio integration](GitHub-and-Portfolio-Handoff.md) for the optional APK download wording.
+
 ## Startup recovery update — 1.2.1+4
 
 11 October 2026, Asia/Dhaka. The new signed Android APK and browser build passed Flutter analysis and all 12 tests. Android 16 emulator installation retained application data. The native recovery test removed the USB backend tunnel, observed the startup error and Retry connection, restored the tunnel, and verified return to the existing Driver account. Evidence is private under `.local/verification/startup-recovery.json`, `startup-offline.png` and `startup-recovered.png`.

@@ -1,6 +1,6 @@
 # RideShare — Flutter/Dart with a connected PHP/MySQL backend
 
-Latest release: **1.2.1+4** — [APK, walkthrough video and portfolio asset package](https://github.com/marzukulamin/rideshare/releases/tag/v1.2.1). The existing video and captions are in [`media/`](media/), recorded on 1.2.0+3. See [GitHub and portfolio integration](docs/GitHub-and-Portfolio-Handoff.md) for copying the video into your website and the backend requirements for a live demo.
+Latest release: **1.3.0+5** — [APK, walkthrough video and portfolio asset package](https://github.com/marzukulamin/rideshare/releases/tag/v1.3.0). Open the app and tap **Try Demo** to explore sample bookings and simulated trips without an account, USB connection, server or internet. Demo actions stay in memory; real account sign-in remains a separate connected experience. The existing video and captions are in [`media/`](media/), recorded on 1.2.0+3. See [GitHub and portfolio integration](docs/GitHub-and-Portfolio-Handoff.md) for visitor instructions and website asset paths.
 
 Android-first Customer, Driver and specialist staff app, plus the same Flutter browser client. Individual accounts and internal PHP/PDO endpoints use durable MySQL-compatible MariaDB state. Customer cannot accept, arrive, start or complete a driver's ride. Only the assigned driver controls those transitions. No external runtime APIs and no portfolio page are included.
 
@@ -12,7 +12,9 @@ Build with `tools/build.ps1 -Target all -JavaHome E:\Java`, using the local Flut
 
 Immediate cash passenger rides, genuine driver offers, private pickup PIN, route changes with both-party consent, safety/support/lost items, receipts/history/rebooking, documents, journal earnings and separately approved manual money/configuration/access workflows are implemented in source. Electronic payments, instant cash-out, stored-value wallet, guest/scheduled/parcel/family/enterprise extensions and native iOS are omitted. Android is installed natively; iPhone access is through its browser.
 
-Current signed 1.2.1+4 includes startup error visibility, Retry connection, loading-state recovery and safe notifications after disposal. Flutter analyzer and all 12 tests pass; emulator and Samsung offline/reconnect recovery and separate Customer/Driver/Support browser smoke checks pass. Samsung installation preserved the existing customer session; place selection and server fare quote passed, and the phone was returned to Customer Home without requesting a ride. Use `tools/connect_android.ps1` to restore the local USB backend tunnel. See the verification report for current APK hash and earlier release evidence.
+The 1.3.0 offline sandbox is documented in [Offline portfolio demo](docs/Offline-Portfolio-Demo.md). For real account testing, `tools/connect_android.ps1` restores the USB backend tunnel.
+
+Previous signed 1.2.1+4 included startup error visibility, Retry connection, loading-state recovery and safe notifications after disposal. Its analyzer and all 12 tests passed; emulator and Samsung offline/reconnect recovery and separate Customer/Driver/Support browser smoke checks passed. Samsung installation preserved the customer session; place selection and server fare quote passed. See the verification report for release-specific evidence.
 
 Previous 1.2.0+3 evidence: 146 backend checks, 10 connected browser journey checks, five native journey checks and five Samsung tracking checks. The navigator reset and keyboard-covered place list were fixed and regressed. Its 45-second actual Android walkthrough, captions and transcript are preserved privately after staging the new APK; they are not evidence for 1.2.1+4. Story-level partial clauses remain in the plan.
 

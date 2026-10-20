@@ -9,7 +9,8 @@ import 'safety.dart';
 
 class LoginPage extends StatefulWidget {
   final PlatformStore store;
-  const LoginPage({super.key, required this.store});
+  final VoidCallback? onTryDemo;
+  const LoginPage({super.key, required this.store, this.onTryDemo});
   @override
   State<LoginPage> createState() => _LoginPageState();
 }
@@ -49,6 +50,17 @@ class _LoginPageState extends State<LoginPage> {
                     style: TextStyle(fontSize: 38, fontWeight: FontWeight.bold),
                   ),
                   const UiText('Your city. Your next ride.'),
+                  if (widget.onTryDemo != null) ...[
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: widget.onTryDemo,
+                      icon: const Icon(Icons.play_arrow),
+                      label: const Text('Try Demo'),
+                    ),
+                    const Text(
+                      'Explore sample rides without an account or internet.',
+                    ),
+                  ],
                   if (widget.store.error != null) ...[
                     const SizedBox(height: 16),
                     Text(

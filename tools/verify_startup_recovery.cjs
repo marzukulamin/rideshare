@@ -24,6 +24,8 @@ async function waitFor(predicate, description) {
     ui.command('shell', 'am', 'force-stop', ui.pkg);
     ui.command('reverse', '--remove', 'tcp:8098');
     ui.command('shell', 'monkey', '-p', ui.pkg, '-c', 'android.intent.category.LAUNCHER', '1');
+    await waitFor(labels => labels.includes('Sign in with an account'), 'The welcome screen did not open.');
+    await ui.click('Sign in with an account', {scroll: false});
     await waitFor(labels => labels.includes('Retry connection'), 'Offline startup did not expose recovery.');
     evidence.push('Offline startup ends loading and displays Retry connection.');
     ui.screenshot('startup-offline-' + deviceLabel);
